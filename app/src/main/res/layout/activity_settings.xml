@@ -20,33 +20,56 @@
     </com.google.android.material.appbar.AppBarLayout>
 
 
-    <Switch
-        android:layout_marginTop="20dp"
-        android:id="@+id/service_enabled_switch"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/service_enabled" />
 
     <TextView
-        android:id="@+id/service_interval_label"
+        android:id="@+id/server_url_label"
         android:layout_marginTop="20dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/service_interval"/>
+        android:text="@string/server_url_label" />
     <EditText
-        android:id="@+id/service_interval_box"
-        android:inputType="number"
+        android:id="@+id/server_url_box"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:gravity="left|center_vertical"
         android:singleLine="true"/>
 
-    <Button
+    <TextView
+        android:id="@+id/observable_id_label"
         android:layout_marginTop="20dp"
-        android:id="@+id/settings_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/observable_id_label"/>
+    <EditText
+        android:id="@+id/observable_id_box"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="left|center_vertical"
+        android:singleLine="true"/>
+
+
+
+
+    <Switch
+        android:id="@+id/job_enabled"
+        android:layout_marginTop="20dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/settings_button" />
+        android:text="@string/job_enabled" />
+
+    <TextView
+        android:id="@+id/job_interval_label"
+        android:layout_marginTop="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/job_interval_label"/>
+    <EditText
+        android:id="@+id/job_interval_box"
+        android:inputType="number"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="left|center_vertical"
+        android:singleLine="true"/>
 
 
 </LinearLayout>

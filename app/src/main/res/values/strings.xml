@@ -1,13 +1,12 @@
 <resources>
     <string name="app_name">Eustace</string>
-    <string name="action_settings">Settings</string>
-    <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
-    <string name="next">Next</string>
-    <string name="previous">Previous</string>
+
+    <string name="service_enabled">Service enabled</string>
+    <string name="service_interval">Service interval (seconds)</string>
+    <string name="settings_button">Open additional settings</string>
 
     <string name="server_url_label">Alexhq server url</string>
     <string name="observable_id_label">Observable id</string>
     <string name="job_enabled">Job enabled</string>
+    <string name="job_interval_label">Send interval (minutes)</string>
 </resources>
