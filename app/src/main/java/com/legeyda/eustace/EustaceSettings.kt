@@ -1,8 +1,7 @@
-package com.legeyda.eustace;
+package cofm.legeyda.eustace;
 
 import android.content.Context
 import android.preference.PreferenceManager
-import androidx.work.PeriodicWorkRequest
 import java.util.*
 
 fun CharSequence?.orDefault(defaultValue: CharSequence): String {
@@ -21,17 +20,16 @@ fun CharSequence?.orRandomUuid(): String {
     }
 }
 
-const val MIN_JOB_INTERVAL_MINUTES = (PeriodicWorkRequest.MIN_PERIODIC_INTERVAL_MILLIS/60/1000).toInt()
+class EustaceSettings(private val context: Context) {
+    private var oldMode: String = ""
+    private var oldServerUrl: String = ""
+    private var oldObservableId: String = ""
+    private var oldWorkerId: String = ""
 
-public class EustaceSettings(private val context: Context) {
+    var mode: String = ""
     var serverUrl: String = ""
     var observableId: String = ""
-    var jobEnabled: Boolean = true
-    var jobInterval: Int = MIN_JOB_INTERVAL_MINUTES
-    var jobId: String = ""
-
-    var serviceEnabled: Boolean = false
-    var serviceInterval: Int = 5;
+    var workerId: String = ""
 
     init {
         load()
@@ -39,37 +37,47 @@ public class EustaceSettings(private val context: Context) {
 
     fun load() {
         val prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        mode = prefs.getString("mode", "").orDefault("background")
         serverUrl = prefs.getString("server_url", "").orDefault("http://alexhq.legeyda.com")
         observableId = prefs.getString("observable_id", "").orRandomUuid()
-        jobInterval = prefs.getInt("job_interval", MIN_JOB_INTERVAL_MINUTES)
-        jobEnabled = prefs.getBoolean("job_enabled", true)
-        jobId = prefs.getString("job_id", "").orDefault("")
-
-        serviceEnabled = prefs.getBoolean("service_enabled", false)
-        serviceInterval = prefs.getInt("service_interval", 5)
+        workerId = prefs.getString("worker_id", "").orDefault("")
+        markAsClean()
     }
 
-    fun save() {
+    private fun markAsClean() {
+        oldMode = mode
+        oldServerUrl = serverUrl
+        oldObservableId = observableId
+        oldWorkerId = workerId
+    }
+
+    fun save(): Boolean {
+        if (!this.dirty) {
+            return false
+        }
+
         val editor = PreferenceManager.getDefaultSharedPreferences(context).edit()
-        if (serverUrl.isNotBlank()) {
+        if (oldMode != mode && mode.isNotBlank()) {
+            editor.putString("mode", mode)
+        }
+        if (oldServerUrl != serverUrl && serverUrl.isNotBlank()) {
             editor.putString("server_url", serverUrl)
         }
-        if (observableId.isNotBlank()) {
+        if (oldObservableId != observableId && observableId.isNotBlank()) {
             editor.putString("observable_id", observableId)
         }
-        editor.putBoolean("job_enabled", jobEnabled)
-        editor.putInt("job_interval", jobInterval)
-        if (jobId.isNotBlank()) {
-            editor.putString("job_id", jobId)
+        if (oldWorkerId != workerId) {
+            editor.putString("worker_id", workerId)
         }
 
-        editor.putBoolean("service_enabled", serviceEnabled)
-        editor.putInt("service_interval", serviceInterval)
-
         editor.apply()
+        markAsClean()
+        return true
     }
 
-    //http://alexhq.legeyda.com
+    val dirty: Boolean
+        get() =
+            oldMode != mode || oldServerUrl != serverUrl || oldObservableId != observableId || oldWorkerId != workerId
 
 }
 

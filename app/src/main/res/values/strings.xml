@@ -1,12 +1,17 @@
 <resources>
     <string name="app_name">Eustace</string>
 
-    <string name="service_enabled">Service enabled</string>
-    <string name="service_interval">Service interval (seconds)</string>
-    <string name="settings_button">Open additional settings</string>
+    <string name="mode">Operation mode</string>
+    <string name="mode_off">Off</string>
+    <string name="mode_background">Background</string>
+    <string name="mode_foreground">Foreground</string>
 
     <string name="server_url_label">Alexhq server url</string>
     <string name="observable_id_label">Observable id</string>
-    <string name="job_enabled">Job enabled</string>
-    <string name="job_interval_label">Send interval (minutes)</string>
+
+    <string name="message_channel_name">Eustace</string>
+    <string name="notification_title">Eustace</string>
+    <string name="notification_text">Eustace position sender running</string>
+
+
 </resources>

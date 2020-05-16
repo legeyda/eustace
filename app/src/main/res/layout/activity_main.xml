@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.MainActivity">
+    tools:context=".MainActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -19,34 +19,63 @@
             app:popupTheme="@style/AppTheme.PopupOverlay" />
     </com.google.android.material.appbar.AppBarLayout>
 
-
-    <Switch
-        android:layout_marginTop="20dp"
-        android:id="@+id/service_enabled_switch"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/service_enabled" />
-
     <TextView
-        android:id="@+id/service_interval_label"
+        android:id="@+id/mode_label"
         android:layout_marginTop="20dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/service_interval"/>
+        android:text="@string/mode"/>
+    <RadioGroup
+        android:id="@+id/mode_radio_group"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <RadioButton
+            android:id="@+id/off_radio_button"
+            android:tag="off"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/mode_off" />
+        <RadioButton
+            android:id="@+id/background_radio_button"
+            android:tag="background"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/mode_background"/>
+        <RadioButton
+            android:id="@+id/foreground_radio_button"
+            android:tag="foreground"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/mode_foreground" />
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/server_url_label"
+        android:layout_marginTop="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/server_url_label" />
     <EditText
-        android:id="@+id/service_interval_box"
-        android:inputType="number"
+        android:id="@+id/server_url_box"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:gravity="left|center_vertical"
         android:singleLine="true"/>
 
-    <Button
+    <TextView
+        android:id="@+id/observable_id_label"
         android:layout_marginTop="20dp"
-        android:id="@+id/settings_button"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/settings_button" />
+        android:text="@string/observable_id_label"/>
+    <EditText
+        android:id="@+id/observable_id_box"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="left|center_vertical"
+        android:singleLine="true"/>
 
 
 </LinearLayout>
