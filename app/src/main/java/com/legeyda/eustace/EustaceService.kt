@@ -27,14 +27,22 @@ class EustaceService: Service() {
                     while (true) {
                         try {
                             Navigator(EustaceSettings(EustaceApplication.INSTANCE.applicationContext))
-                                .sendCurrentPosition(5*1000)
-                            if(Thread.currentThread().isInterrupted) {
+                                .sendCurrentPosition(5 * 1000)
+                            if (Thread.currentThread().isInterrupted) {
                                 break
                             }
-                            Thread.sleep(1*1000)
+                            Thread.sleep(5 * 1000)
                         } catch (e: InterruptedException) {
                             Log.d(javaClass.name, "service thread interrupted")
                             break
+                        } catch(e: Exception) {
+                            Log.e(javaClass.name, "exception", e)
+                            try {
+                                Thread.sleep(5 * 1000)
+                            } catch (e: InterruptedException) {
+                                Log.d(javaClass.name, "service thread interrupted")
+                                break
+                            }
                         }
                     }
                 }

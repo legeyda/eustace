@@ -1,6 +1,7 @@
 package com.legeyda.eustace;
 
 import android.content.Context
+import android.util.Log
 import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import androidx.work.impl.utils.futures.SettableFuture
@@ -14,8 +15,12 @@ class SendPositionWorker(context: Context, workerParams: WorkerParameters) :
     override fun startWork(): ListenableFuture<Result> {
         val result: SettableFuture<Result> = SettableFuture.create();
         Thread {
-            Navigator(EustaceSettings(EustaceApplication.INSTANCE.applicationContext))
-                .sendCurrentPosition(60*1000)
+            try {
+                Navigator(EustaceSettings(EustaceApplication.INSTANCE.applicationContext))
+                    .sendCurrentPosition(60 * 1000)
+            } catch (e :Exception) {
+                Log.e(javaClass.name, "exception", e)
+            }
         }.start()
         return result;
     }
