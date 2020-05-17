@@ -11,12 +11,11 @@ import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.work.impl.utils.futures.SettableFuture
 import cofm.legeyda.eustace.EustaceSettings
-import org.apache.commons.io.IOUtils
-import java.io.BufferedInputStream
 import java.io.OutputStream
 import java.net.HttpURLConnection
 import java.net.URL
 import java.nio.charset.Charset
+import java.util.*
 import java.util.concurrent.Future
 
 
@@ -27,12 +26,12 @@ class Navigator(private val settings: EustaceSettings) {
         val futureLocation = Navigator(settings).getCurrentPosition(minTimeMilli)
         try {
             futureLocation.get()
-        } catch (e : Throwable) {
+        } catch (e: Throwable) {
             Log.w(javaClass.name, "startWork: error getting position ", e)
             return false
         }
 
-        if(!futureLocation.isDone) {
+        if (!futureLocation.isDone) {
             return false
         }
 
@@ -40,22 +39,30 @@ class Navigator(private val settings: EustaceSettings) {
     }
 
     private fun sendPosition(location: Location): Boolean {
-        val url = URL(settings.serverUrl.trimEnd('/') + "/api/v1/observables/" + settings.observableId + "/states")
+        val url =
+            URL(settings.serverUrl.trimEnd('/') + "/api/v1/observables/" + settings.observableId + "/states")
         val conn = url.openConnection() as HttpURLConnection
         conn.requestMethod = "POST"
 
-        val data = String.format("""{"lat":%f,"lon":%f}""", location.latitude, location.longitude)
+        val data = String.format(
+            Locale.ENGLISH,
+            """{"lat":%f,"lon":%f}""",
+            location.latitude,
+            location.longitude
+        )
 
         val os: OutputStream = conn.outputStream
         os.write(data.toByteArray(Charset.forName("UTF-8")))
         os.close()
 
-        return if(conn.responseCode in 200..299) {
+        return if (conn.responseCode in 200..299) {
             Log.i(javaClass.name, "sendPosition: successfully sent")
             true
         } else {
-            val response: String = IOUtils.toString(BufferedInputStream(conn.inputStream), "UTF-8")
-            Log.e(javaClass.name, String.format("sendPosition: error sending, response code %d, body %s", conn.responseCode, response))
+            Log.e(
+                javaClass.name,
+                String.format("sendPosition: error sending, response code %d", conn.responseCode)
+            )
             false
         }
     }
@@ -94,18 +101,53 @@ class Navigator(private val settings: EustaceSettings) {
 
             override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
             }
+
             override fun onProviderEnabled(provider: String?) {}
             override fun onProviderDisabled(provider: String?) {}
         }
 
+
         handlerThread.start()
+        Thread {
+            handlerThread.join(minTimeMilli * 3)
+            if (handlerThread.isAlive) {
+                locationManager.getProviders(true)
+                    .filterNot { it == bestProviderName }
+                    .forEach {
+                        providerName ->
+                        try {
+                            locationManager.requestLocationUpdates(
+                                providerName,
+                                minTimeMilli,
+                                (0.0).toFloat(),
+                                listener,
+                                handlerThread.looper
+                            )
+                        } catch (e: SecurityException) {
+                            locationManager.removeUpdates(listener)
+                            handlerThread.quit()
+                            EustaceApplication.INSTANCE.startActivity(
+                                Intent(EustaceApplication.INSTANCE, MainActivity::class.java)
+                            )
+                            result.setException(e);
+                        }
+                    }
+                handlerThread.join(minTimeMilli * 2)
+                if (handlerThread.isAlive) {
+                    locationManager.removeUpdates(listener)
+                    handlerThread.quit()
+                }
+            }
+        }.start();
+
         try {
             locationManager.requestLocationUpdates(
                 bestProviderName,
                 minTimeMilli,
                 (0.0).toFloat(),
                 listener,
-                handlerThread.looper)
+                handlerThread.looper
+            )
         } catch (e: SecurityException) {
             EustaceApplication.INSTANCE.startActivity(
                 Intent(EustaceApplication.INSTANCE, MainActivity::class.java)
