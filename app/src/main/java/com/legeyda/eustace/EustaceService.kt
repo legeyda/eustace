@@ -1,9 +1,6 @@
 package com.legeyda.eustace;
 
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.Service
+import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -64,10 +61,13 @@ class EustaceService: Service() {
 
     private fun createNotification(): Notification {
         createMessagesNotificationChannel(applicationContext)
+
+        val intent = Intent(EustaceApplication.INSTANCE, MainActivity::class.java)
         return NotificationCompat.Builder(applicationContext, EustaceConstants.NOTIFICATION_CHANNEL_ID)
             .setSmallIcon(R.mipmap.logo192)
             .setContentTitle(applicationContext.getString(R.string.notification_title))
             .setContentText(applicationContext.getString(R.string.notification_text))
+            .setContentIntent(PendingIntent.getActivity(this, 0, intent, 0))
             .build()
     }
 
