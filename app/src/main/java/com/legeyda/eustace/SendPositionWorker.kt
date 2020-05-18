@@ -17,9 +17,11 @@ class SendPositionWorker(context: Context, workerParams: WorkerParameters) :
         Thread {
             try {
                 Navigator(EustaceSettings(EustaceApplication.INSTANCE.applicationContext))
-                    .sendCurrentPosition(60 * 1000)
+                    .sendCurrentPosition(10 * 1000)
+                result.set(Result.success())
             } catch (e :Exception) {
                 Log.e(javaClass.name, "exception", e)
+                result.set(Result.failure())
             }
         }.start()
         return result;

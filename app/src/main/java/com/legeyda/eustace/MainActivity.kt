@@ -13,7 +13,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 import androidx.core.view.children
-import cofm.legeyda.eustace.EustaceSettings
 import kotlinx.android.synthetic.main.activity_main.*
 
 fun Editable.overwrite(newValue: CharSequence?) {
@@ -53,7 +52,7 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         ensureLocationPermissions()
-        val settings = EustaceSettings(this.applicationContext)
+        val settings = EustaceApplication.INSTANCE.settings
         findViewById<RadioGroup>(R.id.mode_radio_group).setSelectedTag(settings.mode)
         findViewById<EditText>(R.id.server_url_box).text.overwrite(settings.serverUrl)
         findViewById<EditText>(R.id.observable_id_box).text.overwrite(settings.observableId)
@@ -61,16 +60,16 @@ class MainActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        val settings = EustaceSettings(this.applicationContext)
+        val settings = EustaceApplication.INSTANCE.settings
         settings.mode = findViewById<RadioGroup>(R.id.mode_radio_group).getSelectedTag().toString()
         settings.serverUrl = findViewById<EditText>(R.id.server_url_box).text.toString()
         settings.observableId = findViewById<EditText>(R.id.observable_id_box).text.toString()
 
         if (settings.dirty) {
-            (application as EustaceApplication).rescheduleWork(settings)
+            (application as EustaceApplication).rescheduleWork()
             settings.save()
         } else {
-            (application as EustaceApplication).ensureWorking(settings)
+            (application as EustaceApplication).ensureWorking()
         }
     }
 

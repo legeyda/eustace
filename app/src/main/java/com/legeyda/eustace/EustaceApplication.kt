@@ -21,24 +21,21 @@ class EustaceApplication : Application() {
         val INSTANCE: EustaceApplication get() = contextHolder.get()!!
     }
 
+    lateinit var settings: EustaceSettings private set
+
     override fun onCreate() {
         super.onCreate()
         contextHolder.set(this)
+        this.settings = EustaceSettings(this.applicationContext)
         this.ensureWorking()
     }
 
     fun ensureWorking() {
-        val settings = EustaceSettings(applicationContext)
-        ensureWorking(settings)
-        settings.save()
+        ensurePeriodicWorkScheduled()
+        ensureServiceWorking()
     }
 
-    fun ensureWorking(settings: EustaceSettings) {
-        ensurePeriodicWorkScheduled(settings)
-        ensureServiceWorking(settings)
-    }
-
-    fun ensurePeriodicWorkScheduled(settings: EustaceSettings) {
+    fun ensurePeriodicWorkScheduled() {
         if (settings.mode != "off") {
             if (settings.workerId.isEmpty()) {
                 val job = PeriodicWorkRequest.Builder(
@@ -57,9 +54,10 @@ class EustaceApplication : Application() {
                 settings.workerId = ""
             }
         }
+        settings.save()
     }
 
-    fun ensureServiceWorking(settings: EustaceSettings) {
+    fun ensureServiceWorking() {
         if (settings.mode == "foreground") {
             ContextCompat.startForegroundService(this, Intent(this, EustaceService::class.java))
         } else {
@@ -68,15 +66,11 @@ class EustaceApplication : Application() {
     }
 
     fun rescheduleWork() {
-        rescheduleWork(EustaceSettings(INSTANCE))
+        reschedulePeriodicWork()
+        ensureServiceWorking()
     }
 
-    fun rescheduleWork(settings: EustaceSettings) {
-        reschedulePeriodicWork(settings)
-        ensureServiceWorking(settings)
-    }
-
-    fun reschedulePeriodicWork(settings: EustaceSettings) {
+    fun reschedulePeriodicWork() {
         if (settings.mode != "off") {
             if (settings.workerId.isNotEmpty()) {
                 WorkManager.getInstance().cancelUniqueWork(settings.workerId);
@@ -105,6 +99,7 @@ class EustaceApplication : Application() {
                 settings.workerId = ""
             }
         }
+        settings.save()
     }
 
 

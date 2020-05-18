@@ -10,7 +10,6 @@ import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import cofm.legeyda.eustace.EustaceSettings
 
 
 const val NOTIFICATION_CHANNEL_ID = "eustace_default";
@@ -24,26 +23,24 @@ class EustaceService: Service() {
         private fun startThread() {
             if(null == workThread) {
                 workThread = Thread {
-                    while (true) {
-                        try {
-                            Navigator(EustaceSettings(EustaceApplication.INSTANCE.applicationContext))
-                                .sendCurrentPosition(5 * 1000)
-                            if (Thread.currentThread().isInterrupted) {
-                                break
-                            }
-                            Thread.sleep(5 * 1000)
-                        } catch (e: InterruptedException) {
-                            Log.d(javaClass.name, "service thread interrupted")
-                            break
-                        } catch(e: Exception) {
-                            Log.e(javaClass.name, "exception", e)
+                    try {
+                        while (true) {
                             try {
-                                Thread.sleep(5 * 1000)
+                                Navigator(EustaceApplication.INSTANCE.settings)
+                                    .sendCurrentPosition(3 * 1000)
+                                if (Thread.currentThread().isInterrupted) {
+                                    break
+                                }
+                                Thread.sleep(1 * 1000)
                             } catch (e: InterruptedException) {
-                                Log.d(javaClass.name, "service thread interrupted")
-                                break
+                                throw e
+                            } catch(e: Exception) {
+                                Log.e(javaClass.name, "exception", e)
+                                Thread.sleep(10 * 1000)
                             }
                         }
+                    } catch (e: InterruptedException) {
+                        Log.d(javaClass.name, "service thread interrupted")
                     }
                 }
                 workThread?.start()
@@ -61,7 +58,7 @@ class EustaceService: Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         startThread();
-        startForeground(0, createNotification())
+        startForeground(1, createNotification())
         return super.onStartCommand(intent, flags, startId)
     }
 

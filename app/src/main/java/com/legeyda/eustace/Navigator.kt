@@ -21,12 +21,11 @@ import java.util.concurrent.Future
 
 class Navigator(private val settings: EustaceSettings) {
 
-
     fun sendCurrentPosition(minTimeMilli: Long): Boolean {
         val futureLocation = Navigator(settings).getCurrentPosition(minTimeMilli)
         try {
             futureLocation.get()
-        } catch (e: Throwable) {
+        } catch (e: Exception) {
             Log.w(javaClass.name, "startWork: error getting position ", e)
             return false
         }
