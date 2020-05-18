@@ -12,8 +12,6 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 
 
-const val NOTIFICATION_CHANNEL_ID = "eustace_default";
-
 class EustaceService: Service() {
 
     companion object {
@@ -58,7 +56,7 @@ class EustaceService: Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         startThread();
-        startForeground(1, createNotification())
+        startForeground(EustaceConstants.NOTIFICATION_ID, createNotification())
         return super.onStartCommand(intent, flags, startId)
     }
 
@@ -66,7 +64,7 @@ class EustaceService: Service() {
 
     private fun createNotification(): Notification {
         createMessagesNotificationChannel(applicationContext)
-        return NotificationCompat.Builder(applicationContext, NOTIFICATION_CHANNEL_ID)
+        return NotificationCompat.Builder(applicationContext, EustaceConstants.NOTIFICATION_CHANNEL_ID)
             .setSmallIcon(R.mipmap.logo192)
             .setContentTitle(applicationContext.getString(R.string.notification_title))
             .setContentText(applicationContext.getString(R.string.notification_text))
@@ -76,7 +74,7 @@ class EustaceService: Service() {
     private fun createMessagesNotificationChannel(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name: CharSequence = context.getString(R.string.message_channel_name)
-            val channel = NotificationChannel(NOTIFICATION_CHANNEL_ID, name, NotificationManager.IMPORTANCE_HIGH)
+            val channel = NotificationChannel(EustaceConstants.NOTIFICATION_CHANNEL_ID, name, NotificationManager.IMPORTANCE_HIGH)
             val notificationManager = context.getSystemService(NotificationManager::class.java)
             notificationManager?.createNotificationChannel(channel)
         }
