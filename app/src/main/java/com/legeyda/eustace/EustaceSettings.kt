@@ -2,6 +2,7 @@ package cofm.legeyda.eustace;
 
 import android.content.Context
 import android.preference.PreferenceManager
+import com.legeyda.eustace.EustaceConstants
 import java.util.*
 
 fun CharSequence?.orDefault(defaultValue: CharSequence): String {
@@ -19,6 +20,7 @@ fun CharSequence?.orRandomUuid(): String {
         this.toString()
     }
 }
+
 
 class EustaceSettings(private val context: Context) {
     private var oldMode: String = ""
@@ -38,7 +40,7 @@ class EustaceSettings(private val context: Context) {
     fun load() {
         val prefs = PreferenceManager.getDefaultSharedPreferences(context);
         mode = prefs.getString("mode", "").orDefault("background")
-        serverUrl = prefs.getString("server_url", "").orDefault("http://alexhq.legeyda.com")
+        serverUrl = prefs.getString("server_url", "").orDefault(EustaceConstants.ALEXHQ_SERVER_URL)
         observableId = prefs.getString("observable_id", "").orRandomUuid()
         workerId = prefs.getString("worker_id", "").orDefault("")
         markAsClean()
