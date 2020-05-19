@@ -30,7 +30,7 @@ class EustaceService: Service() {
 
     @Synchronized
     private fun startThread() {
-        if(null == workThread) {
+        if(null == workThread || !(workThread?.isAlive!!)) {
             workThread = Thread {
                 try {
                     while (true) {
