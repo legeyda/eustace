@@ -7,56 +7,54 @@ import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import java.util.concurrent.atomic.AtomicReference
 
 
 class EustaceService: Service() {
 
     companion object {
-        private var workThread: Thread? = null
-
-        @Synchronized
-        private fun startThread() {
-            if(null == workThread) {
-                workThread = Thread {
-                    try {
-                        while (true) {
-                            try {
-                                Navigator(EustaceApplication.INSTANCE.settings)
-                                    .sendCurrentPosition(3 * 1000)
-                                if (Thread.currentThread().isInterrupted) {
-                                    break
-                                }
-                                Thread.sleep(1 * 1000)
-                            } catch (e: InterruptedException) {
-                                throw e
-                            } catch(e: Exception) {
-                                Log.e(javaClass.name, "exception", e)
-                                Thread.sleep(10 * 1000)
-                            }
-                        }
-                    } catch (e: InterruptedException) {
-                        Log.d(javaClass.name, "service thread interrupted")
-                    }
-                }
-                workThread?.start()
-            }
-        }
-
-        @Synchronized
-        private fun stopThread() {
-            if(null != workThread) {
-                workThread?.interrupt();
-            }
-            workThread = null;
+        private var instanceHolder = AtomicReference<EustaceService>()
+        fun isRunning(): Boolean {
+            return null!=instanceHolder.get()
         }
     }
 
+    private var workThread: Thread? = null
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         startThread();
+        instanceHolder.set(this)
         startForeground(EustaceConstants.NOTIFICATION_ID, createNotification())
         return super.onStartCommand(intent, flags, startId)
     }
 
+    @Synchronized
+    private fun startThread() {
+        if(null == workThread) {
+            workThread = Thread {
+                try {
+                    while (true) {
+                        try {
+                            Navigator(EustaceApplication.INSTANCE.settings)
+                                .sendCurrentPosition(3 * 1000)
+                            if (Thread.currentThread().isInterrupted) {
+                                break
+                            }
+                            Thread.sleep(1 * 1000)
+                        } catch (e: InterruptedException) {
+                            throw e
+                        } catch(e: Exception) {
+                            Log.e(javaClass.name, "exception", e)
+                            Thread.sleep(10 * 1000)
+                        }
+                    }
+                } catch (e: InterruptedException) {
+                    Log.d(javaClass.name, "service thread interrupted")
+                }
+            }
+            workThread?.start()
+        }
+    }
 
 
     private fun createNotification(): Notification {
@@ -85,7 +83,16 @@ class EustaceService: Service() {
     }
 
     override fun onDestroy() {
-        stopThread()
         super.onDestroy()
+        instanceHolder.set(null)
+        stopThread()
+    }
+
+    @Synchronized
+    private fun stopThread() {
+        if(null != workThread) {
+            workThread?.interrupt();
+        }
+        workThread = null;
     }
 }

@@ -16,6 +16,7 @@ class SendPositionWorker(context: Context, workerParams: WorkerParameters) :
         val result: SettableFuture<Result> = SettableFuture.create();
         Thread {
             try {
+                EustaceApplication.INSTANCE.ensureServiceWorking()
                 Navigator(EustaceSettings(EustaceApplication.INSTANCE.applicationContext))
                     .sendCurrentPosition(10 * 1000)
                 result.set(Result.success())

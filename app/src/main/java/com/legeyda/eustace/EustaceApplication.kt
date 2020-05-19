@@ -59,9 +59,13 @@ class EustaceApplication : Application() {
 
     fun ensureServiceWorking() {
         if (settings.mode == "foreground") {
-            ContextCompat.startForegroundService(this, Intent(this, EustaceService::class.java))
+            if(!EustaceService.isRunning()) {
+                ContextCompat.startForegroundService(this, Intent(this, EustaceService::class.java))
+            }
         } else {
-            stopService(Intent(this, EustaceService::class.java))
+            if(EustaceService.isRunning()) {
+                stopService(Intent(this, EustaceService::class.java))
+            }
         }
     }
 
