@@ -7,29 +7,25 @@ import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import java.util.concurrent.atomic.AtomicReference
 
 
 class EustaceService: Service() {
 
-    companion object {
-        private var instanceHolder = AtomicReference<EustaceService>()
-        fun isRunning(): Boolean {
-            return null!=instanceHolder.get()
-        }
-    }
-
+    private var goneForeground = false
     private var workThread: Thread? = null
 
+    @Synchronized
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        startThread();
-        instanceHolder.set(this)
-        startForeground(EustaceConstants.NOTIFICATION_ID, createNotification())
+        ensureThreadStarted();
+        if(!goneForeground) {
+            startForeground(EustaceConstants.NOTIFICATION_ID, createNotification())
+            goneForeground = true
+        }
         return super.onStartCommand(intent, flags, startId)
     }
 
     @Synchronized
-    private fun startThread() {
+    private fun ensureThreadStarted() {
         if(null == workThread || !(workThread?.isAlive!!)) {
             workThread = Thread {
                 try {
@@ -84,15 +80,14 @@ class EustaceService: Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        instanceHolder.set(null)
         stopThread()
     }
 
     @Synchronized
     private fun stopThread() {
         if(null != workThread) {
-            workThread?.interrupt();
+            workThread?.interrupt()
         }
-        workThread = null;
+        workThread = null
     }
 }
