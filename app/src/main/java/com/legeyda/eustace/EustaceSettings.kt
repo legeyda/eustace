@@ -13,16 +13,10 @@ fun CharSequence?.orDefault(defaultValue: CharSequence): String {
     }
 }
 
-fun CharSequence?.orRandomUuid(): String {
-    return if (this.isNullOrEmpty()) {
-        UUID.randomUUID().toString()
-    } else {
-        this.toString()
-    }
-}
-
 
 class EustaceSettings(private val context: Context) {
+    private var forceSaveObservableId = false
+
     private var oldMode: String = ""
     private var oldServerUrl: String = ""
     private var oldObservableId: String = ""
@@ -41,7 +35,15 @@ class EustaceSettings(private val context: Context) {
         val prefs = PreferenceManager.getDefaultSharedPreferences(context);
         mode = prefs.getString("mode", "").orDefault("background")
         serverUrl = prefs.getString("server_url", "").orDefault(EustaceConstants.ALEXHQ_SERVER_URL)
-        observableId = prefs.getString("observable_id", "").orRandomUuid()
+        with(prefs.getString("observable_id", "").orDefault("")) {
+            if("" != this) {
+                forceSaveObservableId = false
+                observableId = this
+            } else {
+                forceSaveObservableId = true
+                observableId = UUID.randomUUID().toString()
+            }
+        }
         workerId = prefs.getString("worker_id", "").orDefault("")
         markAsClean()
     }
@@ -65,7 +67,7 @@ class EustaceSettings(private val context: Context) {
         if (oldServerUrl != serverUrl && serverUrl.isNotBlank()) {
             editor.putString("server_url", serverUrl)
         }
-        if (oldObservableId != observableId && observableId.isNotBlank()) {
+        if (forceSaveObservableId || (oldObservableId != observableId && observableId.isNotBlank())) {
             editor.putString("observable_id", observableId)
         }
         if (oldWorkerId != workerId) {
@@ -79,7 +81,7 @@ class EustaceSettings(private val context: Context) {
 
     val dirty: Boolean
         get() =
-            oldMode != mode || oldServerUrl != serverUrl || oldObservableId != observableId || oldWorkerId != workerId
+            forceSaveObservableId || oldMode != mode || oldServerUrl != serverUrl || oldObservableId != observableId || oldWorkerId != workerId
 
 }
 
